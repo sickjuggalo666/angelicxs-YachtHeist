@@ -350,7 +350,7 @@ RegisterNetEvent('angelicxs-YachtHeist:DisableEngine', function(data)
         PAlert = true
     end
     local number = data.engine
-    local name = tostring(data.name)
+    local name = data.name
     local time = 20
     if data.name == nil then return end
     exports['ps-ui']:Maze(function(success)

@@ -328,7 +328,25 @@ end)
 
 RegisterNetEvent('angelicxs-YachtHeist:DisableEngine', function(data)
     if not PAlert then
-        TriggerEvent('angelicxs-YachtHeist:PoliceAlert',GetEntityCoords(PlayerPedId()))
+        --TriggerEvent('angelicxs-YachtHeist:PoliceAlert',GetEntityCoords(PlayerPedId()))
+        local data = exports['cd_dispatch']:GetPlayerInfo()
+          TriggerServerEvent('cd_dispatch:AddNotification', {
+            job_table = {'police', 'bcso'}, 
+            coords = data.coords,
+            title = '10-XXXX - Yacht Robbery',
+            message = 'Reports of a '..data.sex..' robbing a yacht near '..data.street, 
+            flash = 0,
+            unique_id = tostring(math.random(0000000,9999999)),
+            blip = {
+               sprite = 410, 
+               scale = 1.2, 
+               colour = 5,
+               flashes = false, 
+               text = '911 - Yacht Robbery',
+               time = (5*60*1000),
+               sound = 1,
+             }
+        })
         PAlert = true
     end
     local number = data.engine

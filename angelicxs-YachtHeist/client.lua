@@ -261,6 +261,24 @@ end)
 RegisterNetEvent('angelicxs-YachtHeist:Client:EngineLocations', function()
     if Config.UseThirdEye then
         for engine, location in pairs (EngineTarget) do 
+             exports["fivem-target"]:AddTargetPoint({
+                name= 'YachtEngine'..engine,
+                label = "Engine",
+                icon = "fas fa-engine",
+                point = location,
+                interactDist = 5.0,
+                onInteract = yachtHeist,
+                options = {
+                 {
+                   name = "start_hack",
+                   label = "Disable Engine"
+                 },      
+               },
+               vars = {
+                   engine = engine,
+                   name = 'YachtEngine'..engine
+               }
+             })
              exports[Config.ThirdEyeName]:AddBoxZone('YachtEngine'..engine, location, 5, 4, {
                 name='YachtEngine'..engine,
                 heading = 69.0,
@@ -325,6 +343,45 @@ RegisterNetEvent('angelicxs-YachtHeist:Client:EngineLocations', function()
         end
     end
 end)
+
+yachtHeist = function(targetName,optionName,vars,entityHit)
+  if optionName == "start_hack" then
+      if not PAlert then
+        --TriggerEvent('angelicxs-YachtHeist:PoliceAlert',GetEntityCoords(PlayerPedId()))
+          local data = exports['cd_dispatch']:GetPlayerInfo()
+          TriggerServerEvent('cd_dispatch:AddNotification', {
+            job_table = {'police', 'bcso'}, 
+            coords = data.coords,
+            title = '10-XXXX - Yacht Robbery',
+            message = 'Reports of a '..data.sex..' robbing a yacht near '..data.street, 
+            flash = 0,
+            unique_id = tostring(math.random(0000000,9999999)),
+            blip = {
+               sprite = 410, 
+               scale = 1.2, 
+               colour = 5,
+               flashes = false, 
+               text = '911 - Yacht Robbery',
+               time = (5*60*1000),
+               sound = 1,
+             }
+        })
+          PAlert = true
+       end
+       local number = vars.engine
+       local name = vars.name
+       local time = 20
+       if vars.name == nil then return end
+       exports['ps-ui']:Maze(function(success)
+        if success then
+            local Destroyed = EngineDisabled + 1
+            TriggerServerEvent('angelicxs-YachtHeist:Server:EngineSync',vars.name, Destroyed)
+        else
+            TriggerServerEvent('angelicxs-YachtHeist:server:EngineWine', GetEntityCoords(PlayerPedId()))
+        end
+     end, time)
+  end
+end
 
 RegisterNetEvent('angelicxs-YachtHeist:DisableEngine', function(data)
     if not PAlert then
